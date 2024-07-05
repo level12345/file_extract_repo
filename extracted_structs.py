@@ -41,6 +41,7 @@ def extract_structs_from_file(input_file_path):
             parts = stripped_line.split()
             if len(parts) > 1:
                 struct_name = parts[1].split('{')[0].strip()  # Handle "struct StructName {"
+                print(struct_name)
             else:
                 struct_name = "anonymous_struct"
             if in_union:
@@ -68,7 +69,9 @@ def process_directory(input_dir, intermediate_file_path):
     for filename in os.listdir(input_dir):
         if filename.endswith('.h'):
             input_file_path = os.path.join(input_dir, filename)
+            print(input_file_path)
             structs_content = extract_structs_from_file(input_file_path)
+            # print(structs_content)
             if structs_content:
                 all_structs.extend(structs_content)
 
