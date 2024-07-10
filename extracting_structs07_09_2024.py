@@ -97,7 +97,7 @@ def extract_structs_from_file(input_file_path):
         #         # print(index_position)
         #         # print(union_string[index_position])
         #         unionVal = union_string[index_position]
-        #         stringY = "TM_Buffer[0]."
+        #         stringY = "test_b[0]."
         #         bVal = stringY + unionVal
         #         print(bVal)
         #         # if x in union_string:
