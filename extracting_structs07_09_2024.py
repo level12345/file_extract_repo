@@ -58,6 +58,13 @@ def extract_structs_from_file(input_file_path):
             structs.append(current_struct)
             current_struct = []
 
+### if parts[0] is not within inside list containing exceptible sub strings
+### if parts[0] 
+### length of stripped line is greater than 2 [type var] 
+### do not process
+
+
+        
         # Handling struct members
         elif in_struct:
             parts = stripped_line.split()
