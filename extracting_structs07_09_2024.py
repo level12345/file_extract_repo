@@ -70,11 +70,11 @@ def extract_structs_from_file(input_file_path):
                   if s in parts: 
                     index_position = specific_string.index(s)
                     unionVal = union_string[index_position]
-                    stringY = "TM_Buffer[0]."
+                    stringY = "test_b[0]."
                     bVal = stringY + unionVal
                     # print(bVal)
                 # print(bVal)
-                totalOutput = "msg.payload." + parts[1] + ';'
+                totalOutput = "obj1.obj2." + parts[1] + ';'
                 # print(totalOutput)
                 fullAssignment = ""
                 if len(bVal) > 0:
