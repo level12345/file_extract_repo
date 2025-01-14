@@ -165,4 +165,79 @@ int main() {
 
 //Use semaphore
 
+/////////////////Code Block 1
+#include <vxWorks.h>
+#include <intLib.h>
+#include <taskLib.h>
+#include <stdio.h>
+#include <stdint.h>
+
+// Memory-mapped FIFO register addresses (update with actual addresses)
+#define UART_FIFO_BASE_ADDR   0xFF000000
+#define UART_FIFO_DATA_REG    (UART_FIFO_BASE_ADDR + 0x30)  // FIFO data register
+#define UART_FIFO_STATUS_REG  (UART_FIFO_BASE_ADDR + 0x34)  // FIFO status register
+#define UART_FIFO_EMPTY_FLAG  (1 << 0)  // Bit indicating FIFO is empty
+
+// Shared flag between ISR and main function
+volatile bool uartInterruptFlag = false;
+
+// ISR triggered by the UART interrupt
+void uartIsr(void) {
+    // Set the flag to indicate data is available
+    uartInterruptFlag = true;
+
+    // Optionally clear the interrupt in hardware (if required)
+    // Example:
+    // #define UART_INTERRUPT_ACK_REG (UART_FIFO_BASE_ADDR + 0x3C)
+    // volatile uint32_t *interruptAckReg = reinterpret_cast<uint32_t *>(UART_INTERRUPT_ACK_REG);
+    // *interruptAckReg = 1;  // Acknowledge the interrupt
+}
+
+// Function to process all available FIFO data
+void processFifoData() {
+    // Pointers to FIFO status and data registers
+    volatile uint32_t *fifoStatusReg = reinterpret_cast<uint32_t *>(UART_FIFO_STATUS_REG);
+    volatile uint32_t *fifoDataReg = reinterpret_cast<uint32_t *>(UART_FIFO_DATA_REG);
+
+    // Read and process all data while the FIFO is not empty
+    while (!(*fifoStatusReg & UART_FIFO_EMPTY_FLAG)) {
+        uint32_t data = *fifoDataReg;  // Read the next message
+        printf("Received FIFO data: 0x%X\n", data);  // Handle the message (example processing)
+    }
+}
+
+// Function to perform other ongoing application work
+void performMainWork() {
+    // Simulate ongoing work
+    printf("Main application is running...\n");
+    taskDelay(100);  // Sleep for a short period to simulate work
+}
+
+int main() {
+    // Register the ISR (replace UART_IRQ_NUM with your UART IRQ number)
+    int irqNumber = UART_IRQ_NUM;
+    if (intConnect(INUM_TO_IVEC(irqNumber), (VOIDFUNCPTR)uartIsr, 0) != OK) {
+        printf("Failed to connect UART ISR\n");
+        return -1;
+    }
+
+    // Enable the interrupt
+    intEnable(irqNumber);
+
+    while (true) {
+        // Perform other main application logic
+        performMainWork();
+
+        // Check the flag set by the ISR
+        if (uartInterruptFlag) {
+            // Clear the flag
+            uartInterruptFlag = false;
+
+            // Process all available FIFO data
+            processFifoData();
+        }
+    }
+
+    return 0;
+}
 
